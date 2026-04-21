@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["resources/js/*"],
+            "ziggy-js": ["vendor/tightenco/ziggy"]
+        }
+    },
+    "include": [
+        "resources/js/**/*.js",
+        "resources/js/**/*.vue",
+        "resources/js/**/*.d.ts"
+    ],
+    "exclude": ["node_modules", "public", "vendor"]
+}
