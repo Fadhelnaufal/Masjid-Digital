@@ -1,31 +1,54 @@
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
 import { computed, ref, onMounted, onUnmounted } from "vue";
+// Import AOS
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const props = defineProps({
     canLogin: Boolean,
     namaMasjid: { type: String, default: "Masjid Besar Sambit" },
     qurbanData: { type: Array, default: () => [] },
 });
+
 // State untuk mendeteksi posisi scroll
 const isScrolled = ref(false);
-
-// Fungsi untuk mengecek posisi scroll (berubah jika scroll > 20px)
 const handleScroll = () => {
     isScrolled.value = window.scrollY > 20;
 };
 
-// Pasang event listener saat komponen dimuat
+// Fungsi Smooth Scroll dengan Offset 72px (tinggi navbar)
+const scrollToSection = (id) => {
+    const element = document.getElementById(id.replace("#", ""));
+    if (element) {
+        const offset = 72;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+        });
+    }
+};
+
 onMounted(() => {
     window.addEventListener("scroll", handleScroll);
+
+    // Inisialisasi AOS dengan durasi yang pas
+    AOS.init({
+        duration: 1000,
+        once: true,
+        easing: "ease-out-quad",
+    });
 });
 
-// Bersihkan event listener saat komponen dihancurkan (best practice)
 onUnmounted(() => {
     window.removeEventListener("scroll", handleScroll);
 });
 
-// Computed Qurban stats from qurbanData
+// Computed Qurban stats - Kita kembalikan ke format Object awal
+// agar Template kamu tidak perlu diubah-ubah lagi
 const qurbanStats = computed(() => {
     let totalPeserta = 0;
     let totalSapi = 0;
@@ -80,18 +103,18 @@ const features = [
 
 const activities = [
     {
-        title: "Kajian Fiqih, Kajian Ibadah 4 Madzhab dan Belajar Ngaji",
-        desc: "Di setiap harinya, masjid akan melaksanakan banyak kegiatan keislaman, terbuka untuk masyarakat sekitar dan untuk umum.",
+        title: "Kajian Fiqih & Ibadah",
+        desc: "Setiap harinya masjid melaksanakan kegiatan keislaman yang terbuka untuk masyarakat umum.",
         img: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?w=400&q=80",
     },
     {
-        title: "Sembako Gratis dan Santunan Terhadap Dhuafa",
-        desc: "Tersedia paket sembako gratis dan juga rutin melaksanakan kegiatan santunan terhadap dhuafa.",
+        title: "Sembako & Santunan",
+        desc: "Tersedia paket sembako gratis dan rutin melaksanakan santunan terhadap dhuafa.",
         img: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=400&q=80",
     },
     {
-        title: "Pendidikan dan Pelatihan Kewirausahaan",
-        desc: "Masjid rutin membina jama'ah di segala usia agar memiliki keterampilan dan minat belajar yang tinggi demi masa depan yang cerah.",
+        title: "Pelatihan Kewirausahaan",
+        desc: "Masjid membina jama'ah agar memiliki keterampilan mandiri demi masa depan yang cerah.",
         img: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80",
     },
 ];
@@ -99,31 +122,24 @@ const activities = [
 const galleryImages = [
     {
         src: "https://images.unsplash.com/photo-1545167496-5e27b7b03b5c?w=600&q=80",
-        tall: true,
     },
     {
         src: "https://images.unsplash.com/photo-1591604021695-0c69b7c05981?w=600&q=80",
-        tall: false,
     },
     {
         src: "https://images.unsplash.com/photo-1519817650390-64a993f9e40d?w=600&q=80",
-        tall: false,
     },
     {
         src: "https://images.unsplash.com/photo-1564769662533-4f00a87b4056?w=600&q=80",
-        tall: false,
     },
     {
         src: "https://images.unsplash.com/photo-1568667256549-094345857637?w=600&q=80",
-        tall: false,
     },
     {
         src: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&q=80",
-        tall: false,
     },
     {
         src: "https://images.unsplash.com/photo-1586611292717-f828b167408c?w=600&q=80",
-        tall: false,
     },
 ];
 
@@ -131,15 +147,14 @@ const navLinks = [
     { label: "Beranda", href: "#beranda" },
     { label: "Layanan", href: "#layanan" },
     { label: "Galeri", href: "#galeri" },
-    { label: "Kontak", href: "#kontak" },
+    { label: "Lokasi", href: "#lokasi" },
 ];
 
 const footerLinks = [
-    { label: "Beranda", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Kegiatan", href: "#" },
-    { label: "Tentang", href: "#" },
-    { label: "Kontak", href: "#" },
+    { label: "Beranda", href: "#beranda" },
+    { label: "Layanan", href: "#layanan" },
+    { label: "Galeri", href: "#galeri" },
+    { label: "Lokasi", href: "#lokasi" },
 ];
 
 const kegiatanLinks = [
@@ -164,7 +179,11 @@ const kegiatanLinks = [
                     : 'bg-white/5 backdrop-blur-xl border-b border-white/10', // Style POSISI ATAS
             ]"
         >
-            <a href="#beranda" class="flex items-center gap-3 group">
+            <a
+                href="#"
+                @click.prevent="scrollToSection('#beranda')"
+                class="flex items-center gap-3 group"
+            >
                 <div
                     class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
                 >
@@ -207,6 +226,7 @@ const kegiatanLinks = [
                 <li v-for="link in navLinks" :key="link.label">
                     <a
                         :href="link.href"
+                        @click.prevent="scrollToSection(link.href)"
                         class="px-4 py-2 rounded-full text-white/80 text-sm font-medium hover:text-white hover:bg-white/10 transition-all duration-300 ease-out"
                     >
                         {{ link.label }}
@@ -215,12 +235,32 @@ const kegiatanLinks = [
             </ul>
 
             <div class="hidden sm:flex items-center gap-4">
-                <a
-                    href="#qurban"
-                    class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-emerald-950 bg-white rounded-full hover:bg-gray-100 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all duration-300 ease-out"
+                <Link
+                    :href="route('login')"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300 ease-out group"
                 >
-                    Laporan Publik
-                </a>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 transition-opacity"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect
+                            width="18"
+                            height="11"
+                            x="3"
+                            y="11"
+                            rx="2"
+                            ry="2"
+                        />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    Admin Portal
+                </Link>
             </div>
 
             <button
@@ -274,6 +314,8 @@ const kegiatanLinks = [
                 <!-- Badge -->
                 <div
                     class="inline-flex items-center gap-2 bg-white/10 border border-white/25 backdrop-blur px-4 py-1.5 rounded-full mb-8"
+                    data-aos="fade-up"
+                    data-aos-delay="200"
                 >
                     <span
                         class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
@@ -287,6 +329,8 @@ const kegiatanLinks = [
                 <!-- Headline -->
                 <h1
                     class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-3xl mb-6"
+                    data-aos="fade-up"
+                    data-aos-delay="400"
                 >
                     Temukan kedamaian dan layanan umat melalui
                     <span class="text-emerald-300">{{ namaMasjid }}.</span>
@@ -295,13 +339,19 @@ const kegiatanLinks = [
                 <!-- Subheadline -->
                 <p
                     class="text-white/75 text-base md:text-lg max-w-xl leading-relaxed mb-10"
+                    data-aos="fade-up"
+                    data-aos-delay="600"
                 >
                     Portal digital terintegrasi untuk pendaftaran Qurban, Zakat,
                     dan Laporan Keuangan secara transparan.
                 </p>
 
                 <!-- Buttons -->
-                <div class="flex flex-wrap gap-4">
+                <div
+                    class="flex flex-wrap gap-4"
+                    data-aos="fade-up"
+                    data-aos-delay="800"
+                >
                     <a
                         href="#qurban"
                         class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-900/40 hover:shadow-emerald-700/40 hover:-translate-y-0.5"
@@ -322,7 +372,7 @@ const kegiatanLinks = [
                         Daftar Qurban 2026
                     </a>
                     <a
-                        href="#kontak"
+                        href="#lokasi"
                         class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-xl backdrop-blur-sm transition-all"
                     >
                         <svg
@@ -350,7 +400,11 @@ const kegiatanLinks = [
         >
             <div class="max-w-6xl mx-auto px-6 lg:px-16">
                 <!-- Label -->
-                <div class="text-center mb-14">
+                <div
+                    class="text-center mb-14"
+                    data-aos="fade-down"
+                    data-aos-delay="200"
+                >
                     <span
                         class="text-emerald-600 text-xs font-bold tracking-widest uppercase mb-3 block"
                         >Fitur</span
@@ -365,12 +419,14 @@ const kegiatanLinks = [
                 <!-- Cards grid -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <div
-                        v-for="f in features"
+                        v-for="(f, index) in features"
                         :key="f.title"
-                        class="flex flex-col items-center text-center p-6 rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow border border-gray-100 group"
+                        data-aos="fade-up"
+                        :data-aos-delay="index * 300"
+                        class="flex flex-col items-center text-center p-6 rounded-2xl bg-white shadow-sm hover:shadow-md transition-all border border-gray-100 group hover:-translate-y-2 duration-300"
                     >
                         <div
-                            class="w-16 h-16 rounded-full bg-emerald-700 flex items-center justify-center text-white mb-4 group-hover:bg-emerald-600 transition-colors"
+                            class="w-16 h-16 rounded-full bg-emerald-700 flex items-center justify-center text-white mb-4 group-hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-900/10"
                             v-html="f.icon"
                         ></div>
                         <h3
@@ -395,7 +451,11 @@ const kegiatanLinks = [
         >
             <div class="max-w-6xl mx-auto px-6 lg:px-16">
                 <!-- Label -->
-                <div class="text-center mb-14">
+                <div
+                    class="text-center mb-14"
+                    data-aos="fade-down"
+                    data-aos-delay="200"
+                >
                     <span
                         class="text-emerald-300 text-xs font-bold tracking-widest uppercase mb-3 block"
                         >Kegiatan</span
@@ -410,20 +470,22 @@ const kegiatanLinks = [
                 <!-- Activity cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div
-                        v-for="act in activities"
+                        v-for="(act, index) in activities"
                         :key="act.title"
-                        class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow hover:-translate-y-1 transform duration-200"
+                        data-aos="fade-up"
+                        :data-aos-delay="index * 200"
+                        class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 duration-300"
                     >
                         <div class="h-44 overflow-hidden">
                             <img
                                 :src="act.img"
                                 :alt="act.title"
-                                class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                             />
                         </div>
-                        <div class="p-5">
+                        <div class="p-6">
                             <h3
-                                class="font-bold text-gray-900 text-sm leading-snug mb-2"
+                                class="font-bold text-gray-900 text-base leading-snug mb-3"
                             >
                                 {{ act.title }}
                             </h3>
@@ -439,7 +501,11 @@ const kegiatanLinks = [
         <!-- ======= QURBAN STATS SECTION ======= -->
         <section id="qurban" class="py-24 bg-white">
             <div class="max-w-6xl mx-auto px-6 lg:px-16">
-                <div class="text-center mb-14">
+                <div
+                    class="text-center mb-14"
+                    data-aos="fade-down"
+                    data-aos-delay="200"
+                >
                     <span
                         class="text-emerald-600 text-xs font-bold tracking-widest uppercase mb-3 block"
                         >Qurban 2026</span
@@ -466,14 +532,17 @@ const kegiatanLinks = [
                             #f0fdf4 100%
                         );
                     "
+                    data-aos="fade-up"
+                    data-aos-delay="400"
                 >
                     <div class="p-8 md:p-12">
-                        <!-- Top stats row -->
                         <div
                             class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10"
                         >
                             <div
-                                class="bg-white rounded-2xl p-6 shadow-sm text-center"
+                                data-aos="zoom-in"
+                                data-aos-delay="100"
+                                class="bg-white rounded-2xl p-6 shadow-sm text-center hover:shadow-md transition-all duration-300"
                             >
                                 <div
                                     class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mx-auto mb-3"
@@ -503,8 +572,11 @@ const kegiatanLinks = [
                                     Total Peserta
                                 </div>
                             </div>
+
                             <div
-                                class="bg-white rounded-2xl p-6 shadow-sm text-center"
+                                data-aos="zoom-in"
+                                data-aos-delay="200"
+                                class="bg-white rounded-2xl p-6 shadow-sm text-center hover:shadow-md transition-all duration-300"
                             >
                                 <div
                                     class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto mb-3"
@@ -532,8 +604,11 @@ const kegiatanLinks = [
                                     Kelompok Sapi
                                 </div>
                             </div>
+
                             <div
-                                class="bg-white rounded-2xl p-6 shadow-sm text-center"
+                                data-aos="zoom-in"
+                                data-aos-delay="300"
+                                class="bg-white rounded-2xl p-6 shadow-sm text-center hover:shadow-md transition-all duration-300"
                             >
                                 <div
                                     class="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center mx-auto mb-3"
@@ -561,8 +636,11 @@ const kegiatanLinks = [
                                     Kelompok Kambing
                                 </div>
                             </div>
+
                             <div
-                                class="bg-white rounded-2xl p-6 shadow-sm text-center"
+                                data-aos="zoom-in"
+                                data-aos-delay="400"
+                                class="bg-white rounded-2xl p-6 shadow-sm text-center hover:shadow-md transition-all duration-300"
                             >
                                 <div
                                     class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mx-auto mb-3"
@@ -592,9 +670,9 @@ const kegiatanLinks = [
                             </div>
                         </div>
 
-                        <!-- Kelompok list -->
                         <div v-if="qurbanData && qurbanData.length > 0">
                             <h3
+                                data-aos="fade-right"
                                 class="font-bold text-gray-700 text-sm mb-4 flex items-center gap-2"
                             >
                                 <span
@@ -604,9 +682,11 @@ const kegiatanLinks = [
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div
-                                    v-for="kelompok in qurbanData"
+                                    v-for="(kelompok, index) in qurbanData"
                                     :key="kelompok.id"
-                                    class="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between border border-emerald-50 hover:border-emerald-200 transition-colors"
+                                    data-aos="fade-up"
+                                    :data-aos-delay="index * 100"
+                                    class="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between border border-emerald-50 hover:border-emerald-200 transition-all duration-300 hover:-translate-y-1"
                                 >
                                     <div>
                                         <div
@@ -649,8 +729,11 @@ const kegiatanLinks = [
                             </div>
                         </div>
 
-                        <!-- Empty state -->
-                        <div v-else class="text-center py-10">
+                        <div
+                            v-else
+                            data-aos="fade-up"
+                            class="text-center py-10"
+                        >
                             <div
                                 class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4"
                             >
@@ -681,10 +764,9 @@ const kegiatanLinks = [
         </section>
 
         <!-- ======= GALLERY SECTION ======= -->
-        <section id="galeri" class="py-24 bg-gray-50">
+        <section id="galeri" class="py-24 bg-gray-50 overflow-hidden">
             <div class="max-w-6xl mx-auto px-6 lg:px-16">
-                <!-- Label -->
-                <div class="text-center mb-14">
+                <div class="text-center mb-14" data-aos="fade-up">
                     <span
                         class="text-emerald-600 text-xs font-bold tracking-widest uppercase mb-3 block"
                         >Foto</span
@@ -696,65 +778,92 @@ const kegiatanLinks = [
                     </h2>
                 </div>
 
-                <!-- Gallery grid — mirrors image layout -->
                 <div
                     class="grid grid-cols-4 grid-rows-2 gap-3 h-96 md:h-[480px]"
                 >
-                    <!-- Large left image -->
                     <div
-                        class="col-span-2 row-span-2 rounded-2xl overflow-hidden"
+                        class="col-span-2 row-span-2 rounded-2xl overflow-hidden shadow-sm"
+                        data-aos="fade-right"
+                        data-aos-duration="1200"
                     >
                         <img
                             :src="galleryImages[0].src"
                             alt="Masjid"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 cursor-pointer"
                         />
                     </div>
-                    <!-- Top-right 2 columns -->
-                    <div class="col-span-1 rounded-2xl overflow-hidden">
+
+                    <div
+                        class="col-span-1 rounded-2xl overflow-hidden shadow-sm"
+                        data-aos="fade-down"
+                        data-aos-delay="200"
+                    >
                         <img
                             :src="galleryImages[1].src"
                             alt="Masjid"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 cursor-pointer"
                         />
                     </div>
-                    <div class="col-span-1 rounded-2xl overflow-hidden">
+
+                    <div
+                        class="col-span-1 rounded-2xl overflow-hidden shadow-sm"
+                        data-aos="fade-left"
+                        data-aos-delay="400"
+                    >
                         <img
                             :src="galleryImages[2].src"
                             alt="Masjid"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 cursor-pointer"
                         />
                     </div>
-                    <!-- Bottom-right 3 images -->
-                    <div class="col-span-1 rounded-2xl overflow-hidden">
+
+                    <div
+                        class="col-span-1 rounded-2xl overflow-hidden shadow-sm"
+                        data-aos="fade-up"
+                        data-aos-delay="600"
+                    >
                         <img
                             :src="galleryImages[3].src"
                             alt="Masjid"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 cursor-pointer"
                         />
                     </div>
-                    <div class="col-span-1 rounded-2xl overflow-hidden">
+
+                    <div
+                        class="col-span-1 rounded-2xl overflow-hidden shadow-sm"
+                        data-aos="fade-left"
+                        data-aos-delay="800"
+                    >
                         <img
                             :src="galleryImages[4].src"
                             alt="Masjid"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 cursor-pointer"
                         />
                     </div>
                 </div>
-                <!-- Second row of gallery -->
+
                 <div class="grid grid-cols-3 gap-3 mt-3 h-44 md:h-56">
-                    <div class="rounded-2xl overflow-hidden">
+                    <div
+                        class="rounded-2xl overflow-hidden shadow-sm"
+                        data-aos="zoom-in"
+                        data-aos-delay="900"
+                    >
                         <img
                             :src="galleryImages[5].src"
                             alt="Masjid"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 cursor-pointer"
                         />
                     </div>
-                    <div class="col-span-2 rounded-2xl overflow-hidden">
+
+                    <div
+                        class="col-span-2 rounded-2xl overflow-hidden shadow-sm"
+                        data-aos="fade-up"
+                        data-aos-delay="1000"
+                    >
                         <img
                             :src="galleryImages[6].src"
                             alt="Masjid"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover hover:scale-110 transition-transform duration-700 cursor-pointer"
                         />
                     </div>
                 </div>
@@ -762,9 +871,13 @@ const kegiatanLinks = [
         </section>
 
         <!-- ======= MAP SECTION ======= -->
-        <section id="kontak" class="py-24 bg-white">
+        <section id="lokasi" class="py-24 bg-white">
             <div class="max-w-6xl mx-auto px-6 lg:px-16">
-                <div class="text-center mb-14">
+                <div
+                    class="text-center mb-14"
+                    data-aos="fade-down"
+                    data-aos-delay="200"
+                >
                     <span
                         class="text-emerald-600 text-xs font-bold tracking-widest uppercase mb-3 block"
                         >Lokasi</span
@@ -779,6 +892,8 @@ const kegiatanLinks = [
                 <!-- Map placeholder -->
                 <div
                     class="rounded-3xl overflow-hidden shadow-lg border border-gray-100 h-80 md:h-[420px] bg-gray-200 relative"
+                    data-aos="fade-up"
+                    data-aos-delay="400"
                 >
                     <!-- Embed a real OpenStreetMap iframe as placeholder -->
                     <iframe
@@ -966,23 +1081,23 @@ const kegiatanLinks = [
                         <ul class="space-y-3 text-xs text-gray-400">
                             <li class="flex items-start gap-2">
                                 <svg
-                                    class="w-4 h-4 text-emerald-400 mt-0.5 shrink-0"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
                                     fill="currentColor"
-                                    viewBox="0 0 24 24"
+                                    class="bi bi-whatsapp"
+                                    viewBox="0 0 16 16"
                                 >
                                     <path
-                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
-                                    />
-                                    <path
-                                        d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.05 21.5l4.443-1.163A9.953 9.953 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 11.999 2z"
+                                        d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"
                                     />
                                 </svg>
-                                <span
-                                    >0812-3456-7890
-                                    <strong class="text-white"
-                                        >(WA)</strong
-                                    ></span
-                                >
+                                <span>
+                                    0812-3456-7890
+                                    <strong class="text-white font-bold ml-1"
+                                        >(WhatsApp)</strong
+                                    >
+                                </span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <svg
@@ -1021,7 +1136,8 @@ const kegiatanLinks = [
                                     />
                                 </svg>
                                 <span
-                                    >Jl. Roudhoh No. 1, Malang, Jawa Timur</span
+                                    >Jl.Arif Rahman Hakim, Tamansari, Sambit,
+                                    Ponorogo</span
                                 >
                             </li>
                         </ul>

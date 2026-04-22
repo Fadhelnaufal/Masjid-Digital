@@ -25,6 +25,7 @@
         "@primevue/themes": "^4.5.4",
         "@remixicon/vue": "^4.9.0",
         "@vueuse/core": "^14.2.1",
+        "aos": "^2.3.4",
         "chart.js": "^4.5.1",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
